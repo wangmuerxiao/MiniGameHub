@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>语音功能测试</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #0f0f23;
+      color: #f0f0ff;
+      min-height: 100vh;
+      padding: 16px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header p { color: #8888aa; font-size: 0.85rem; margin-top: 6px; }
+    .back-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: #8888aa;
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.1); color: #f0f0ff; }
+
+    .panel {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #ffd43b;
+    }
+
+    /* 状态指示 */
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .status-item {
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .status-label { font-size: 0.75rem; color: #8888aa; margin-bottom: 4px; }
+    .status-value { font-size: 1.1rem; font-weight: 700; }
+    .status-value.ok { color: #51cf66; }
+    .status-value.warn { color: #ffa94d; }
+    .status-value.err { color: #ff6b6b; }
+    .status-value.idle { color: #8888aa; }
+
+    /* 控制按钮 */
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    .btn-primary:hover { box-shadow: 0 4px 15px rgba(102,126,234,0.4); }
+    .btn-danger { background: #ff6b6b; color: white; }
+    .btn-secondary { background: rgba(255,255,255,0.08); color: #f0f0ff; border: 1px solid rgba(255,255,255,0.15); }
+    .btn-voice-on {
+      background: linear-gradient(135deg, #51cf66, #2b8a3e) !important;
+      color: white !important;
+      animation: voicePulse 1.5s ease-in-out infinite;
+    }
+    @keyframes voicePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(81, 207, 102, 0.5); }
+      50% { box-shadow: 0 0 0 8px rgba(81, 207, 102, 0); }
+    }
+
+    /* 日志区域 */
+    .log-area {
+      background: #0a0a1a;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      height: 350px;
+      overflow-y: auto;
+      padding: 10px;
+      font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .log-line { padding: 1px 0; word-break: break-all; }
+    .log-line.info { color: #4dabf7; }
+    .log-line.send { color: #51cf66; }
+    .log-line.recv { color: #ffa94d; }
+    .log-line.err { color: #ff6b6b; }
+    .log-line.warn { color: #ffd43b; }
+    .log-line .ts { color: #555577; margin-right: 6px; }
+
+    .log-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .log-actions .btn { padding: 8px 14px; font-size: 0.8rem; }
+
+    /* 联动测试 */
+    .test-info {
+      color: #8888aa;
+      font-size: 0.8rem;
+      line-height: 1.6;
+    }
+    .test-info strong { color: #f0f0ff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/game" class="back-btn">← 返回游戏大厅</a>
+
+    <div class="header">
+      <h1>🎤 语音功能测试</h1>
+      <p>测试 WebRTC 语音连接，查看完整日志</p>
+    </div>
+
+    <!-- 连接状态 -->
+    <div class="panel">
+      <div class="panel-title">📊 连接状态</div>
+      <div class="status-grid">
+        <div class="status-item">
+          <div class="status-label">WebSocket</div>
+          <div class="status-value idle" id="st-ws">未连接</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">麦克风</div>
+          <div class="status-value idle" id="st-mic">未获取</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">PeerConnection</div>
+          <div class="status-value idle" id="st-pc">无</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">远程音频</div>
+          <div class="status-value idle" id="st-audio">无</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 操作控制 -->
+    <div class="panel">
+      <div class="panel-title">🎮 操作</div>
+      <div class="controls">
+        <button class="btn btn-primary" id="btn-connect" onclick="VT.connectWS()">连接服务器</button>
+        <button class="btn btn-primary" id="btn-mic" onclick="VT.getMic()" disabled>获取麦克风</button>
+        <button class="btn btn-primary" id="btn-voice" onclick="VT.toggleVoice()" disabled>开启语音</button>
+        <button class="btn btn-danger" onclick="VT.cleanup()">重置全部</button>
+      </div>
+    </div>
+
+    <!-- 使用说明 -->
+    <div class="panel">
+      <div class="panel-title">📖 测试方法</div>
+      <div class="test-info">
+        <p>1. 在<strong>两个不同浏览器/设备</strong>打开此页面</p>
+        <p>2. 两边都点「连接服务器」</p>
+        <p>3. 一边点「开启语音」创建房间，把房间码告诉另一边</p>
+        <p>4. 另一边输入房间码加入</p>
+        <p>5. 双方都点「开启语音」</p>
+        <p>6. 观察日志中 WebRTC 连接是否成功</p>
+        <p>7. 如果连接失败，把日志<strong>复制发给我</strong></p>
+      </div>
+    </div>
+
+    <!-- 房间操作 -->
+    <div class="panel">
+      <div class="panel-title">🏠 房间</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+        <button class="btn btn-primary" id="btn-create" onclick="VT.createRoom()" disabled>创建房间</button>
+        <div style="display:flex; gap:6px; flex:1; min-width:0;">
+          <input type="text" id="room-input" placeholder="输入房间码" maxlength="6" inputmode="numeric"
+            style="flex:1; min-width:0; padding:8px 12px; border:1px solid rgba(255,255,255,0.15); border-radius:8px;
+            background:rgba(255,255,255,0.06); color:#f0f0ff; font-size:0.9rem; text-align:center; letter-spacing:4px; outline:none;">
+          <button class="btn btn-secondary" id="btn-join" onclick="VT.joinRoom()" disabled>加入</button>
+        </div>
+      </div>
+      <div id="room-info" style="font-size:0.85rem; color:#8888aa;"></div>
+    </div>
+
+    <!-- 日志 -->
+    <div class="panel">
+      <div class="panel-title">📋 日志</div>
+      <div class="log-area" id="log-area"></div>
+      <div class="log-actions">
+        <button class="btn btn-secondary" onclick="VT.copyLog()">📋 复制全部日志</button>
+        <button class="btn btn-secondary" onclick="VT.clearLog()">🗑️ 清空</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const VT = {
+    ws: null,
+    micStream: null,
+    pc: null,
+    remoteAudio: null,
+    roomCode: null,
+    myId: null,
+    peerId: null,
+    voiceEnabled: false,
+    ICE_SERVERS: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun.miwifi.com:3478' },
+      { urls: 'stun:stun.chat.bilibili.com:3478' },
+      { urls: 'stun:stun.hitv.com:3478' },
+      // 免费TURN中继（STUN打洞失败时自动fallback）
+      { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+    ],
+
+    log(msg, type = 'info') {
+      const area = document.getElementById('log-area');
+      const ts = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+      const div = document.createElement('div');
+      div.className = 'log-line ' + type;
+      div.innerHTML = '<span class="ts">[' + ts + ']</span>' + msg;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    },
+
+    updateStatus(id, text, cls) {
+      const el = document.getElementById(id);
+      el.textContent = text;
+      el.className = 'status-value ' + cls;
+    },
+
+    getWsUrl() {
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      return proto + '//' + location.host + '/game/ws';
+    },
+
+    connectWS() {
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        this.log('已连接', 'warn');
+        return;
+      }
+      this.log('正在连接 ' + this.getWsUrl() + ' ...');
+      this.ws = new WebSocket(this.getWsUrl());
+      this.ws.onopen = () => {
+        this.log('✅ WebSocket 已连接', 'ok');
+        this.updateStatus('st-ws', '已连接', 'ok');
+        document.getElementById('btn-create').disabled = false;
+        document.getElementById('btn-join').disabled = false;
+        document.getElementById('btn-mic').disabled = false;
+        document.getElementById('btn-voice').disabled = false;
+        this.ws.send(JSON.stringify({ type: 'ping' }));
+      };
+      this.ws.onclose = () => {
+        this.log('❌ WebSocket 已断开', 'err');
+        this.updateStatus('st-ws', '已断开', 'err');
+      };
+      this.ws.onerror = (e) => {
+        this.log('❌ WebSocket 错误', 'err');
+      };
+      this.ws.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          this.handleMsg(msg);
+        } catch(err) {
+          this.log('解析失败: ' + e.data, 'err');
+        }
+      };
+    },
+
+    handleMsg(msg) {
+      switch(msg.type) {
+        case 'pong':
+          this.log('← pong', 'recv');
+          break;
+        case 'room_created':
+          this.roomCode = msg.roomCode;
+          this.myId = msg.playerId;
+          this.log('✅ 房间已创建: ' + msg.roomCode + ' (我: ' + this.myId + ')', 'ok');
+          document.getElementById('room-info').textContent = '房间码: ' + msg.roomCode + ' | 我的ID: ' + this.myId;
+          break;
+        case 'room_joined':
+          this.roomCode = msg.roomCode;
+          this.myId = msg.playerId;
+          this.log('✅ 已加入房间: ' + msg.roomCode + ' (我: ' + this.myId + ')', 'ok');
+          document.getElementById('room-info').textContent = '房间码: ' + msg.roomCode + ' | 我的ID: ' + this.myId;
+          break;
+        case 'player_joined':
+          this.peerId = msg.playerId;
+          this.log('👤 对手加入: ' + msg.playerId, 'recv');
+          break;
+        case 'voice_start':
+          this.log('← voice_start from: ' + msg.from, 'recv');
+          this.onVoiceStart(msg.from);
+          break;
+        case 'webrtc_offer':
+          this.log('← offer from: ' + msg.from, 'recv');
+          this.handleOffer(msg.from, msg.sdp);
+          break;
+        case 'webrtc_answer':
+          this.log('← answer from: ' + msg.from, 'recv');
+          this.handleAnswer(msg.from, msg.sdp);
+          break;
+        case 'webrtc_ice_candidate':
+          this.handleICE(msg.from, msg.candidate);
+          break;
+        case 'error':
+          this.log('⚠️ 错误: ' + msg.message, 'err');
+          break;
+        default:
+          this.log('← ' + msg.type, 'recv');
+      }
+    },
+
+    async getMic() {
+      try {
+        this.log('请求麦克风权限...');
+        this.micStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+          video: false
+        });
+        this.log('✅ 麦克风已获取, tracks: ' + this.micStream.getTracks().length, 'ok');
+        this.updateStatus('st-mic', '已获取', 'ok');
+      } catch(err) {
+        this.log('❌ 麦克风失败: ' + err.name + ' - ' + err.message, 'err');
+        this.updateStatus('st-mic', '失败', 'err');
+      }
+    },
+
+    createRoom() {
+      if (!this.ws || this.ws.readyState !== 1) { this.log('未连接', 'err'); return; }
+      this.ws.send(JSON.stringify({ type: 'create_room', game: 'drawguess' }));
+      this.log('→ create_room (drawguess)', 'send');
+    },
+
+    joinRoom() {
+      const code = document.getElementById('room-input').value.trim();
+      if (code.length !== 6) { this.log('请输入6位房间码', 'warn'); return; }
+      if (!this.ws || this.ws.readyState !== 1) { this.log('未连接', 'err'); return; }
+      this.ws.send(JSON.stringify({ type: 'join_room', roomCode: code }));
+      this.log('→ join_room: ' + code, 'send');
+    },
+
+    toggleVoice() {
+      if (!this.ws || this.ws.readyState !== 1) { this.log('未连接', 'err'); return; }
+      const btn = document.getElementById('btn-voice');
+      if (this.voiceEnabled) {
+        this.voiceEnabled = false;
+        if (this.micStream) this.micStream.getTracks().forEach(t => t.enabled = false);
+        btn.textContent = '🎤 开启语音';
+        btn.classList.remove('btn-voice-on');
+        this.log('语音已关闭', 'info');
+      } else {
+        this.voiceEnabled = true;
+        btn.textContent = '🟢 语音已开启';
+        btn.classList.add('btn-voice-on');
+        if (!this.micStream) {
+          this.getMic().then(() => {
+            this.ws.send(JSON.stringify({ type: 'voice_start' }));
+            this.log('→ voice_start', 'send');
+          });
+        } else {
+          this.micStream.getTracks().forEach(t => t.enabled = true);
+          this.ws.send(JSON.stringify({ type: 'voice_start' }));
+          this.log('→ voice_start', 'send');
+        }
+      }
+    },
+
+    onVoiceStart(peerId) {
+      this.peerId = peerId;
+      const pc = this.pc;
+
+      // PC已存在且可用：检查是否需要补充音频
+      if (pc && pc.connectionState !== 'closed' && pc.connectionState !== 'failed') {
+        if (this.voiceEnabled && this.micStream) {
+          let needOffer = false;
+          this.micStream.getTracks().forEach(t => {
+            if (!pc.getSenders().some(s => s.track === t)) {
+              try { pc.addTrack(t, this.micStream); needOffer = true; } catch(e) {}
+            }
+          });
+          if (needOffer && (pc.signalingState === 'stable' || pc.signalingState === 'have-remote-offer')) {
+            this.log('补充音频, 重新协商', 'info');
+            this.createOffer(peerId);
+          }
+        }
+        return;
+      }
+
+      if (this.voiceEnabled && this.micStream) {
+        this.log('创建PC+Offer → ' + peerId, 'info');
+        this.createPC(peerId);
+        this.micStream.getTracks().forEach(t => {
+          try { this.pc.addTrack(t, this.micStream); } catch(e) {}
+        });
+        this.createOffer(peerId);
+      } else {
+        this.log('回复voice_start', 'info');
+        this._voiceStartSent = true;
+        this.ws.send(JSON.stringify({ type: 'voice_start' }));
+      }
+    },
+
+    createPC(peerId) {
+      if (this.pc) { try { this.pc.close(); } catch(e) {} }
+      this._iceCount = 0;
+      this._iceTypes = [];
+      this._pcCreateTime = Date.now();
+      this.log('创建PC: ' + peerId, 'info');
+      this.pc = new RTCPeerConnection({ iceServers: this.ICE_SERVERS });
+      this.updateStatus('st-pc', '已创建', 'ok');
+
+      // 记录ICE candidate类型（诊断用）
+      this.pc.onicecandidate = (e) => {
+        if (e.candidate) {
+          this._iceCount++;
+          const parts = e.candidate.candidate.split(' ');
+          const type = parts[7]; // host / srflx / relay
+          if (type && !this._iceTypes.includes(type)) this._iceTypes.push(type);
+          this.ws.send(JSON.stringify({ type: 'webrtc_ice_candidate', candidate: e.candidate, to: peerId }));
+        } else {
+          // ICE收集完毕
+          this.log('ICE收集完毕: ' + this._iceCount + '个 [' + this._iceTypes.join('+') + ']', 'info');
+        }
+      };
+      this.pc.ontrack = (e) => {
+        this.log('🎵 收到远程音轨', 'ok');
+        this.updateStatus('st-audio', '已收到', 'ok');
+        if (e.streams && e.streams[0]) this.playRemote(e.streams[0]);
+      };
+      this.pc.onconnectionstatechange = () => {
+        const s = this.pc.connectionState;
+        const elapsed = Date.now() - this._pcCreateTime;
+        if (s === 'connected') {
+          this.log('✅ PC已连接 ' + elapsed + 'ms (ICE: [' + this._iceTypes.join('+') + '])', 'ok');
+        } else if (s === 'failed') {
+          this.log('❌ PC连接失败 ' + elapsed + 'ms (ICE: [' + this._iceTypes.join('+') + '])', 'err');
+        } else if (s === 'connecting') {
+          this.log('⏳ PC连接中...', 'info');
+        }
+        this.updateStatus('st-pc', s, s === 'connected' ? 'ok' : s === 'failed' ? 'err' : 'warn');
+      };
+    },
+
+    playRemote(stream) {
+      if (!this.remoteAudio) {
+        this.remoteAudio = document.createElement('audio');
+        this.remoteAudio.autoplay = true;
+        this.remoteAudio.playsinline = true;
+        this.remoteAudio.muted = false;
+        this.remoteAudio.volume = 1.0;
+        this.remoteAudio.style.display = 'none';
+        document.body.appendChild(this.remoteAudio);
+      }
+      this.remoteAudio.srcObject = stream;
+      this.remoteAudio.play().then(() => {
+        this.log('✅ 远程音频播放成功', 'ok');
+        this.updateStatus('st-audio', '播放中', 'ok');
+      }).catch(err => {
+        this.log('⚠️ 播放被阻止: ' + err.message + ' (点击页面重试)', 'warn');
+        const tryPlay = () => {
+          this.remoteAudio.play().then(() => {
+            this.log('✅ 用户交互后播放成功', 'ok');
+            this.updateStatus('st-audio', '播放中', 'ok');
+          }).catch(()=>{});
+          document.removeEventListener('click', tryPlay);
+        };
+        document.addEventListener('click', tryPlay);
+      });
+    },
+
+    async createOffer(peerId) {
+      try {
+        const offer = await this.pc.createOffer();
+        await this.pc.setLocalDescription(offer);
+        this.log('→ offer → ' + peerId, 'send');
+        this.ws.send(JSON.stringify({ type: 'webrtc_offer', sdp: this.pc.localDescription, to: peerId }));
+      } catch(err) {
+        this.log('❌ Offer失败: ' + err.message, 'err');
+      }
+    },
+
+    async handleOffer(peerId, sdp) {
+      if (!this.pc) this.createPC(peerId);
+      if (this.pc.signalingState === 'have-local-offer') {
+        this.log('⚡ Glare, rollback', 'warn');
+        try { await this.pc.setLocalDescription({ type: 'rollback' }); } catch(e) {}
+      }
+      if (this.micStream) {
+        this.micStream.getTracks().forEach(t => {
+          if (!this.pc.getSenders().some(s => s.track === t)) {
+            try { this.pc.addTrack(t, this.micStream); } catch(e) {}
+          }
+        });
+      }
+      try {
+        await this.pc.setRemoteDescription(new RTCSessionDescription(sdp));
+        const answer = await this.pc.createAnswer();
+        await this.pc.setLocalDescription(answer);
+        this.log('→ answer → ' + peerId, 'send');
+        this.ws.send(JSON.stringify({ type: 'webrtc_answer', sdp: this.pc.localDescription, to: peerId }));
+        this._flushPendingICE();
+      } catch(err) {
+        this.log('❌ Offer处理失败: ' + err.message, 'err');
+      }
+    },
+
+    async handleAnswer(peerId, sdp) {
+      if (!this.pc || this.pc.signalingState !== 'have-local-offer') return;
+      try {
+        await this.pc.setRemoteDescription(new RTCSessionDescription(sdp));
+        this.log('✅ Answer已设置', 'ok');
+        this._flushPendingICE();
+      } catch(err) {
+        this.log('❌ Answer失败: ' + err.message, 'err');
+      }
+    },
+
+    async handleICE(peerId, candidate) {
+      if (!this.pc) return;
+      if (!this.pc.remoteDescription) {
+        if (!this.pc._pendingICE) this.pc._pendingICE = [];
+        this.pc._pendingICE.push(candidate);
+        return;
+      }
+      try { await this.pc.addIceCandidate(new RTCIceCandidate(candidate)); }
+      catch(err) {}
+    },
+
+    async _flushPendingICE() {
+      if (!this.pc || !this.pc._pendingICE || !this.pc._pendingICE.length) return;
+      this.log('处理缓存ICE: ' + this.pc._pendingICE.length + '个', 'info');
+      for (const c of this.pc._pendingICE) {
+        try { await this.pc.addIceCandidate(new RTCIceCandidate(c)); } catch(e) {}
+      }
+      this.pc._pendingICE = [];
+    },
+
+    cleanup() {
+      if (this.pc) { try { this.pc.close(); } catch(e) {} this.pc = null; }
+      if (this.micStream) { this.micStream.getTracks().forEach(t => t.stop()); this.micStream = null; }
+      if (this.remoteAudio) { this.remoteAudio.srcObject = null; this.remoteAudio = null; }
+      if (this.ws) { this.ws.onclose = null; this.ws.close(); this.ws = null; }
+      this.voiceEnabled = false;
+      this.roomCode = null; this.myId = null; this.peerId = null;
+      this.updateStatus('st-ws', '未连接', 'idle');
+      this.updateStatus('st-mic', '未获取', 'idle');
+      this.updateStatus('st-pc', '无', 'idle');
+      this.updateStatus('st-audio', '无', 'idle');
+      document.getElementById('room-info').textContent = '';
+      document.getElementById('btn-create').disabled = true;
+      document.getElementById('btn-join').disabled = true;
+      document.getElementById('btn-mic').disabled = true;
+      document.getElementById('btn-voice').disabled = true;
+      this.log('已重置全部状态', 'info');
+    },
+
+    copyLog() {
+      const area = document.getElementById('log-area');
+      const text = Array.from(area.querySelectorAll('.log-line')).map(el => el.textContent).join('\n');
+      navigator.clipboard.writeText(text).then(() => {
+        this.log('✅ 日志已复制到剪贴板', 'ok');
+      }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); this.log('✅ 日志已复制', 'ok'); }
+        catch(e) { this.log('复制失败，请手动选择日志复制', 'warn'); }
+        document.body.removeChild(ta);
+      });
+    },
+
+    clearLog() {
+      document.getElementById('log-area').innerHTML = '';
+      this.log('日志已清空', 'info');
+    }
+    };
+  </script>
+</body>
+</html>

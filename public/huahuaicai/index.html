@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>默契画猜</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- ===== 首页 ===== -->
+  <div id="view-home" class="view active">
+    <div class="floating-doodles" id="floating-doodles"></div>
+    <div class="home-container">
+      <div class="top-bar">
+        <button class="btn btn-ghost btn-sm" onclick="window.location.href='/game'">← 游戏大厅</button>
+      </div>
+      <div class="home-header">
+        <h1 class="home-title">
+          <span class="home-title-icon">🎨</span>
+          默契画猜
+        </h1>
+        <p class="home-subtitle">画得再丑，只要对方能猜出来就行</p>
+      </div>
+      <div class="home-menu">
+        <button class="btn btn-primary btn-lg" onclick="App.showRoom()">
+          <span class="btn-icon">🎮</span> 创建房间
+        </button>
+        <button class="btn btn-secondary btn-lg" onclick="App.showJoinRoom()">
+          <span class="btn-icon">🚪</span> 加入房间
+        </button>
+        <button class="btn btn-ghost" onclick="App.showRules()">
+          <span class="btn-icon">📖</span> 游戏规则
+        </button>
+        <button class="btn btn-ghost" onclick="App.showHistory()">
+          <span class="btn-icon">📊</span> 历史战绩
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 规则页 ===== -->
+  <div id="view-rules" class="view">
+    <div class="panel-container">
+      <div class="panel-header">
+        <h2>📖 游戏规则</h2>
+        <button class="btn-close" onclick="App.showHome()">✕</button>
+      </div>
+      <div class="panel-body">
+        <div class="rules-section">
+          <h3>🎮 基本玩法</h3>
+          <p>双人合作：一人画，一人猜。画手获得词语并在画板上绘画，猜词者根据画面猜测词语。</p>
+          <p>✅ 可以画画 · ✅ 可以语音交流 · ❌ 不可以说出词语的任何字</p>
+        </div>
+        <div class="rules-section">
+          <h3>🏆 闯关模式（18关）</h3>
+          <div class="level-list">
+            <div class="level-item"><span class="level-num">1</span><span class="level-name">新手画师</span><span class="level-desc">90秒 · 有提示 · 教学关</span></div>
+            <div class="level-item"><span class="level-num">2</span><span class="level-name">灵魂画手</span><span class="level-desc">75秒 · 连错扣时</span></div>
+            <div class="level-item"><span class="level-num">3</span><span class="level-name">极速挑战</span><span class="level-desc">45秒 · 无提示</span></div>
+            <div class="level-item"><span class="level-num">4</span><span class="level-name">三笔大师</span><span class="level-desc">60秒 · 最多3笔</span></div>
+            <div class="level-item"><span class="level-num">5</span><span class="level-name">盲画危机</span><span class="level-desc">60秒 · 看不到画布</span></div>
+            <div class="level-item"><span class="level-num">6</span><span class="level-name">一笔封神</span><span class="level-desc">60秒 · 只能画一笔</span></div>
+            <div class="level-item"><span class="level-num">7</span><span class="level-name">隐形墨水</span><span class="level-desc">75秒 · 笔画3秒后消失</span></div>
+            <div class="level-item"><span class="level-num">8</span><span class="level-name">越来越粗</span><span class="level-desc">60秒 · 笔刷自动变粗</span></div>
+            <div class="level-item"><span class="level-num">9</span><span class="level-name">越来越细</span><span class="level-desc">60秒 · 笔刷自动变细</span></div>
+            <div class="level-item"><span class="level-num">10</span><span class="level-name">倒计时爆炸</span><span class="level-desc">60秒 · 每10秒清空画布</span></div>
+            <div class="level-item"><span class="level-num">11</span><span class="level-name">画布旋转</span><span class="level-desc">75秒 · 画布每5秒旋转90°</span></div>
+            <div class="level-item"><span class="level-num">12</span><span class="level-name">反向提示</span><span class="level-desc">75秒 · 系统提示是假的</span></div>
+            <div class="level-item"><span class="level-num">13</span><span class="level-name">只能画不能说</span><span class="level-desc">60秒 · 关闭语音</span></div>
+            <div class="level-item"><span class="level-num">14</span><span class="level-name">反义词挑战</span><span class="level-desc">75秒 · 只能用反义描述</span></div>
+            <div class="level-item"><span class="level-num">15</span><span class="level-name">相反画法</span><span class="level-desc">60秒 · 画与词语相反的东西</span></div>
+            <div class="level-item"><span class="level-num">16</span><span class="level-name">抽象大师</span><span class="level-desc">90秒 · 语音交流为主</span></div>
+            <div class="level-item"><span class="level-num">17</span><span class="level-name">幸运轮盘</span><span class="level-desc">60秒 · 开局随机负面BUFF</span></div>
+            <div class="level-item"><span class="level-num">18</span><span class="level-name">史诗Boss关</span><span class="level-desc">180秒 · 连续挑战10个词</span></div>
+          </div>
+        </div>
+        <div class="rules-section">
+          <h3>♾️ 无限模式</h3>
+          <p>通关18关后解锁。初始300秒，猜对+20秒并交换身份。50轮后解锁专属词库，难度逐渐升级。</p>
+        </div>
+        <div class="rules-section">
+          <h3>⭐ 评级</h3>
+          <p>根据正确率和最高连续猜中次数评定：D(初识) → C(普通) → B(搭档) → A(灵犀) → S(共鸣) → SS(成神) → SSS(无需语言)</p>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-primary" onclick="App.showHome()">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 历史战绩 ===== -->
+  <div id="view-history" class="view">
+    <div class="panel-container">
+      <div class="panel-header">
+        <h2>📊 历史战绩</h2>
+        <button class="btn-close" onclick="App.showHome()">✕</button>
+      </div>
+      <div class="panel-body">
+        <div class="history-empty">
+          <div class="history-empty-icon">🎮</div>
+          <p>还没有游戏记录</p>
+          <p class="text-secondary">快去创建房间开始游戏吧！</p>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-primary" onclick="App.showHome()">返回</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 房间页 ===== -->
+  <div id="view-room" class="view">
+    <div class="room-container">
+      <div class="room-header">
+        <button class="btn btn-ghost btn-sm" onclick="App.leaveRoom()">← 退出</button>
+        <h2>🎨 默契画猜</h2>
+        <div></div>
+      </div>
+
+      <!-- 加入房间输入 -->
+      <div id="room-join-panel" class="room-join-panel" style="display:none;">
+        <p class="join-label">输入房间码加入游戏</p>
+        <div class="input-group">
+          <input type="text" id="room-code-input" class="input-room-code" placeholder="6位房间码" maxlength="6" inputmode="numeric" pattern="[0-9]*">
+          <button class="btn btn-primary" onclick="Room.joinRoom()">加入</button>
+        </div>
+        <button class="btn btn-ghost" onclick="App.showHome()">← 返回</button>
+      </div>
+
+      <!-- 等待房间 -->
+      <div id="room-wait-panel" class="room-wait-panel">
+        <div class="room-code-display">
+          <span>房间码（已自动复制）</span>
+          <strong id="room-code-text">------</strong>
+          <button class="btn btn-ghost btn-sm" onclick="Room.copyCode()">📋 再次复制</button>
+        </div>
+
+        <div class="player-slots">
+          <div class="player-slot" id="player-slot-0">
+            <div class="player-avatar">🎨</div>
+            <div class="player-name">等待加入...</div>
+            <div class="player-status">-</div>
+          </div>
+          <div class="player-slot-vs">VS</div>
+          <div class="player-slot" id="player-slot-1">
+            <div class="player-avatar">🖼️</div>
+            <div class="player-name">等待加入...</div>
+            <div class="player-status">-</div>
+          </div>
+        </div>
+
+        <div class="room-wait-hint">
+          <div class="spinner"></div>
+          <p id="room-wait-text">等待对手加入...</p>
+        </div>
+
+        <div class="mode-select">
+          <label class="mode-option">
+            <input type="radio" name="game-mode" value="campaign" checked> 🏆 闯关模式
+          </label>
+          <label class="mode-option">
+            <input type="radio" name="game-mode" value="infinite"> ♾️ 无限模式
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 倒计时 ===== -->
+  <div id="view-countdown" class="view">
+    <div class="countdown-container">
+      <div class="countdown-number" id="countdown-number">3</div>
+      <div class="countdown-text" id="countdown-text">准备好了吗？</div>
+    </div>
+  </div>
+
+  <!-- ===== 游戏主界面 ===== -->
+  <div id="view-game" class="view">
+    <div class="game-container">
+      <!-- 顶部 HUD -->
+      <div class="game-hud">
+        <div class="hud-left">
+          <button class="btn btn-ghost btn-sm hud-exit" onclick="Game.exitGame()">← 退出</button>
+          <span class="hud-level" id="hud-level">关卡 1</span>
+          <span class="hud-round" id="hud-round">第 1 回合</span>
+        </div>
+        <div class="hud-center">
+          <div class="hud-timer" id="hud-timer">
+            <span class="timer-icon">⏱️</span>
+            <span class="timer-value" id="timer-value">90</span>
+          </div>
+        </div>
+        <div class="hud-right">
+          <span class="hud-score" id="hud-score">🏆 0</span>
+          <span class="hud-streak" id="hud-streak" style="display:none;">🔥 0</span>
+        </div>
+      </div>
+
+      <!-- 状态栏 -->
+      <div class="game-status-bar">
+        <div class="status-role" id="status-role">你是画手</div>
+        <div class="status-word" id="status-word">苹果</div>
+        <div class="status-strokes" id="status-strokes" style="display:none;">0/3 笔</div>
+        <div class="status-wrong" id="status-wrong" style="display:none;">❌ 0</div>
+      </div>
+
+      <!-- 画板区域 -->
+      <div class="canvas-wrapper" id="canvas-wrapper">
+        <canvas id="draw-canvas"></canvas>
+        <!-- 盲画遮罩 -->
+        <div class="canvas-overlay" id="canvas-overlay" style="display:none;">
+          <div class="overlay-content">
+            <div class="overlay-icon">🙈</div>
+            <p>你正在盲画！</p>
+            <p class="text-secondary">看不到画布，凭感觉画吧</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 画笔工具栏（画布下方） -->
+      <div class="toolbar" id="toolbar">
+        <div class="toolbar-colors">
+          <button class="color-btn active" data-color="#2d2d3f" style="background:#2d2d3f"></button>
+          <button class="color-btn" data-color="#ff3b30" style="background:#ff3b30"></button>
+          <button class="color-btn" data-color="#ff9500" style="background:#ff9500"></button>
+          <button class="color-btn" data-color="#ffcc00" style="background:#ffcc00"></button>
+          <button class="color-btn" data-color="#34c759" style="background:#34c759"></button>
+          <button class="color-btn" data-color="#4a90d9" style="background:#4a90d9"></button>
+          <button class="color-btn" data-color="#7c4dff" style="background:#7c4dff"></button>
+          <button class="color-btn" data-color="#ffffff" style="background:#ffffff; border:1px solid #ccc"></button>
+        </div>
+        <div class="toolbar-sizes">
+          <button class="size-btn active" data-width="3"><span style="width:4px;height:4px"></span></button>
+          <button class="size-btn" data-width="6"><span style="width:8px;height:8px"></span></button>
+          <button class="size-btn" data-width="12"><span style="width:14px;height:14px"></span></button>
+        </div>
+        <div class="toolbar-actions">
+          <button class="tool-btn" id="undo-btn" onclick="CanvasManager.undo()">↩️</button>
+          <button class="tool-btn" id="clear-btn" onclick="CanvasManager.clear()">🗑️</button>
+          <button class="tool-btn" id="hint-btn" onclick="Game.requestHint()" style="display:none;">💡</button>
+        </div>
+      </div>
+
+      <!-- 底部猜测区域 -->
+      <div class="guess-area" id="guess-area">
+        <div class="guess-messages" id="guess-messages"></div>
+        <div class="guess-input-row">
+          <button class="voice-btn-inline" id="voice-btn" onclick="Voice.toggle()" title="开启语音">🎤</button>
+          <input type="text" id="guess-input" class="guess-input" placeholder="输入猜测..." autocomplete="off">
+          <button class="btn btn-primary btn-send" id="guess-btn" onclick="Guess.submit()">发送</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 关卡完成 ===== -->
+  <div id="view-level-complete" class="view">
+    <div class="level-complete-container">
+      <div class="lc-stars" id="lc-stars">⭐⭐⭐</div>
+      <h2 class="lc-title" id="lc-title">关卡通过！</h2>
+      <div class="lc-stats" id="lc-stats"></div>
+      <div class="lc-actions">
+        <button class="btn btn-primary btn-lg" id="lc-next-btn" onclick="Game.nextLevel()">下一关 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 结算页 ===== -->
+  <div id="view-result" class="view">
+    <div class="result-container">
+      <div class="result-icon" id="result-icon">🎉</div>
+      <h2 class="result-title" id="result-title">游戏结束</h2>
+      <div class="result-grade" id="result-grade">
+        <span class="grade-letter" id="grade-letter">A</span>
+        <span class="grade-label" id="grade-label">心有灵犀</span>
+      </div>
+      <p class="result-message" id="result-message">你们的默契令人羡慕！</p>
+      <div class="result-stats" id="result-stats"></div>
+      <div class="result-actions">
+        <button class="btn btn-primary btn-lg" onclick="App.restartGame()">🔄 再来一局</button>
+        <button class="btn btn-secondary" onclick="App.showHome()">🏠 返回大厅</button>
+        <button class="btn btn-ghost ai-btn" onclick="App.showAIReport()">
+          🤖 AI默契分析 <span class="badge-soon">即将上线</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Toast ===== -->
+  <div id="toast" class="toast"></div>
+
+  <!-- ===== 游戏规则提示 ===== -->
+  <div id="rules-overlay" class="rules-overlay" style="display:none;">
+    <div class="rules-card">
+      <div class="rules-icon">📜</div>
+      <h3>游戏规则</h3>
+      <div class="rules-text">
+        <p>✅ 你们可以<b>画画</b></p>
+        <p>✅ 你们可以<b>语音交流</b></p>
+        <p>❌ 但是<b>不可以说出词语的任何字</b></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 脚本 ===== -->
+  <script src="js/levels.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/ws.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/canvas.js"></script>
+  <script src="js/guess.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/room.js"></script>
+  <script src="js/result.js"></script>
+  <script src="js/lobby.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

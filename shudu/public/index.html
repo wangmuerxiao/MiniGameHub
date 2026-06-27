@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数独游戏</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 模式选择页面 -->
+  <div id="mode-select" class="container">
+    <header class="header">
+      <h1 class="title">
+        <span class="title-icon">🔢</span>
+        数独游戏
+      </h1>
+      <p class="subtitle">选择游戏模式</p>
+    </header>
+
+    <div class="mode-grid">
+      <!-- 单人模式 -->
+      <div class="mode-card" onclick="showDifficultySelect()">
+        <div class="mode-card-content">
+          <div class="mode-icon">🎮</div>
+          <h2 class="mode-name">单人模式</h2>
+          <p class="mode-desc">挑战不同难度的数独谜题</p>
+          <span class="mode-badge">单机</span>
+        </div>
+      </div>
+
+      <!-- 联机模式 -->
+      <div class="mode-card mode-card--coming">
+        <div class="mode-card-content">
+          <div class="mode-icon">🌐</div>
+          <h2 class="mode-name">联机模式</h2>
+          <p class="mode-desc">与其他玩家一起解题</p>
+          <span class="mode-badge">即将推出</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-ghost" onclick="goBack()">← 返回游戏大厅</button>
+  </div>
+
+  <!-- 难度选择页面 -->
+  <div id="difficulty-select" class="container" style="display:none;">
+    <header class="header">
+      <h1 class="title">
+        <span class="title-icon">🎯</span>
+        选择难度
+      </h1>
+      <p class="subtitle">选择适合你的难度级别</p>
+    </header>
+
+    <div class="difficulty-grid">
+      <div class="difficulty-card difficulty-easy" onclick="startGame('easy')">
+        <div class="difficulty-icon">😊</div>
+        <h3 class="difficulty-name">简单</h3>
+        <p class="difficulty-desc">适合初学者</p>
+        <p class="difficulty-hint">提示：只需基础技巧</p>
+      </div>
+
+      <div class="difficulty-card difficulty-medium" onclick="startGame('medium')">
+        <div class="difficulty-icon">🤔</div>
+        <h3 class="difficulty-name">中等</h3>
+        <p class="difficulty-desc">需要一些思考</p>
+        <p class="difficulty-hint">提示：可能需要排除法</p>
+      </div>
+
+      <div class="difficulty-card difficulty-hard" onclick="startGame('hard')">
+        <div class="difficulty-icon">😤</div>
+        <h3 class="difficulty-name">困难</h3>
+        <p class="difficulty-desc">挑战你的极限</p>
+        <p class="difficulty-hint">提示：需要高级技巧</p>
+      </div>
+    </div>
+
+    <button class="btn btn-ghost" onclick="showModeSelect()">← 返回模式选择</button>
+  </div>
+
+  <!-- 游戏页面 -->
+  <div id="game-view" class="container" style="display:none;">
+    <header class="game-header">
+      <div class="game-info">
+        <button class="btn btn-ghost btn-sm" onclick="showModeSelect()">← 返回</button>
+        <div class="game-stats">
+          <span class="stat-item">⏱️ <span id="timer">00:00</span></span>
+          <span class="stat-item">💡 <span id="hints-count">3</span></span>
+          <span class="stat-item">❌ <span id="errors-count">0</span></span>
+        </div>
+      </div>
+      <div class="game-difficulty" id="game-difficulty">简单</div>
+    </header>
+
+    <div class="game-container">
+      <!-- 数独棋盘 -->
+      <div class="sudoku-board" id="sudoku-board">
+        <!-- 9x9 网格将由 JavaScript 生成 -->
+      </div>
+
+      <!-- 数字输入面板 -->
+      <div class="numpad">
+        <button class="numpad-btn" onclick="inputNumber(1)">1</button>
+        <button class="numpad-btn" onclick="inputNumber(2)">2</button>
+        <button class="numpad-btn" onclick="inputNumber(3)">3</button>
+        <button class="numpad-btn" onclick="inputNumber(4)">4</button>
+        <button class="numpad-btn" onclick="inputNumber(5)">5</button>
+        <button class="numpad-btn" onclick="inputNumber(6)">6</button>
+        <button class="numpad-btn" onclick="inputNumber(7)">7</button>
+        <button class="numpad-btn" onclick="inputNumber(8)">8</button>
+        <button class="numpad-btn" onclick="inputNumber(9)">9</button>
+        <button class="numpad-btn numpad-btn--erase" onclick="eraseNumber()">⌫</button>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="game-actions">
+        <button class="action-btn" onclick="getHint()">💡 提示</button>
+        <button class="action-btn" onclick="undoAction()">↩️ 撤销</button>
+        <button class="action-btn" onclick="restartGame()">🔄 重新开始</button>
+        <button class="action-btn" onclick="checkSolution()">✅ 检查</button>
+      </div>
+    </div>
+
+    <!-- 完成弹窗 -->
+    <div id="complete-overlay" class="overlay" style="display:none;">
+      <div class="overlay-content">
+        <div class="complete-icon">🎉</div>
+        <h2 class="complete-title">恭喜完成！</h2>
+        <p class="complete-stats" id="complete-stats"></p>
+        <div class="complete-actions">
+          <button class="btn btn-primary" onclick="restartGame()">再来一局</button>
+          <button class="btn btn-secondary" onclick="showModeSelect()">返回选择</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="js/game.js"></script>
+</body>
+</html>

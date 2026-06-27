@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/game/">
+  <title>阿标科技-小游戏平台</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 背景粒子 -->
+  <canvas id="particles"></canvas>
+
+  <!-- ===== 游戏大厅 ===== -->
+  <div id="lobby" class="container">
+    <header class="header">
+      <h1 class="title">
+        <span class="title-icon">🎮</span>
+        阿标科技-小游戏平台
+      </h1>
+      <p class="subtitle">选择一款游戏，邀请好友一起玩</p>
+    </header>
+
+    <!-- 品牌标识 -->
+    <div class="brand-logo lobby-brand">阿标科技</div>
+
+    <div class="game-grid">
+      <!-- 五子棋卡片 -->
+      <div class="game-card" data-game="gomoku" onclick="selectGame('gomoku')">
+        <div class="game-card-glow"></div>
+        <div class="game-card-content">
+          <div class="game-icon">
+            <svg viewBox="0 0 100 100" width="80" height="80">
+              <rect x="5" y="5" width="90" height="90" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+              <line x1="5" y1="25" x2="95" y2="25" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+              <line x1="5" y1="45" x2="95" y2="45" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+              <line x1="5" y1="65" x2="95" y2="65" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+              <line x1="5" y1="85" x2="95" y2="85" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+              <line x1="25" y1="5" x2="25" y2="95" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+              <line x1="45" y1="5" x2="45" y2="95" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+              <line x1="65" y1="5" x2="65" y2="95" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+              <line x1="85" y1="5" x2="85" y2="95" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+              <circle cx="35" cy="35" r="7" fill="currentColor"/>
+              <circle cx="65" cy="55" r="7" fill="none" stroke="currentColor" stroke-width="2.5"/>
+              <circle cx="45" cy="75" r="7" fill="currentColor"/>
+            </svg>
+          </div>
+          <h2 class="game-name">五子棋</h2>
+          <p class="game-desc">经典双人对弈，五连珠获胜</p>
+          <span class="game-badge">2人</span>
+        </div>
+      </div>
+
+      <!-- 数独卡片 -->
+      <div class="game-card" data-game="sudoku" onclick="window.location.href='shudu/index.html'">
+        <div class="game-card-glow"></div>
+        <div class="game-card-content">
+          <div class="game-icon">
+            <svg viewBox="0 0 100 100" width="80" height="80">
+              <!-- 数独网格 -->
+              <rect x="10" y="10" width="80" height="80" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+              <!-- 3x3 宫格线 -->
+              <line x1="36.7" y1="10" x2="36.7" y2="90" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="63.3" y1="10" x2="63.3" y2="90" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="10" y1="36.7" x2="90" y2="36.7" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="10" y1="63.3" x2="90" y2="63.3" stroke="currentColor" stroke-width="1.5"/>
+              <!-- 数字示例 -->
+              <text x="23" y="30" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">5</text>
+              <text x="50" y="30" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">3</text>
+              <text x="77" y="30" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">1</text>
+              <text x="23" y="56" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">7</text>
+              <text x="50" y="56" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">9</text>
+              <text x="77" y="56" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">6</text>
+              <text x="23" y="82" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">2</text>
+              <text x="50" y="82" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">8</text>
+              <text x="77" y="82" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">4</text>
+            </svg>
+          </div>
+          <h2 class="game-name">数独</h2>
+          <p class="game-desc">经典数字逻辑谜题</p>
+          <span class="game-badge">单人</span>
+        </div>
+      </div>
+
+      <!-- 默契画猜卡片 -->
+      <div class="game-card" data-game="huahuaicai" onclick="window.location.href='huahuaicai/index.html'">
+        <div class="game-card-glow"></div>
+        <div class="game-card-content">
+          <div class="game-icon">
+            <svg viewBox="0 0 100 100" width="80" height="80">
+              <!-- 画笔 -->
+              <line x1="20" y1="80" x2="60" y2="25" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              <polygon points="56,29 64,21 62,23 58,27" fill="currentColor"/>
+              <circle cx="60" cy="25" r="3" fill="currentColor" opacity="0.5"/>
+              <!-- 画板 -->
+              <rect x="30" y="40" width="50" height="40" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+              <circle cx="45" cy="55" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M52 70 L62 55 L72 65 L77 58" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <!-- 问号 -->
+              <text x="80" y="30" fill="currentColor" font-size="18" font-weight="bold">?</text>
+            </svg>
+          </div>
+          <h2 class="game-name">默契画猜</h2>
+          <p class="game-desc">双人合作画猜闯关</p>
+          <span class="game-badge">合作</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 工具链接 -->
+    <div class="utility-links">
+      <a href="/game/voicetest/index.html" class="utility-link">🎤 语音功能测试</a>
+    </div>
+  </div>
+
+  <!-- ===== 房间面板 ===== -->
+  <div id="room-panel" class="modal-overlay" style="display:none;">
+    <div class="modal">
+      <button class="modal-close" onclick="closeRoomPanel()">&times;</button>
+      <h2 id="room-game-title">五子棋</h2>
+
+      <!-- 创建房间 -->
+      <div id="create-view">
+        <div class="room-actions">
+          <button class="btn btn-primary" onclick="createRoom()">
+            <span class="btn-icon">🏠</span> 创建房间
+          </button>
+          <button class="btn btn-secondary" onclick="showJoinView()">
+            <span class="btn-icon">🚪</span> 加入房间
+          </button>
+        </div>
+      </div>
+
+      <!-- 加入房间 -->
+      <div id="join-view" style="display:none;">
+        <div class="input-group">
+          <input
+            type="text"
+            id="room-code-input"
+            placeholder="输入6位数字房间码"
+            maxlength="6"
+            autocomplete="off"
+            class="input-room-code"
+            inputmode="numeric"
+            pattern="[0-9]*"
+          >
+          <button class="btn btn-primary" onclick="joinRoom()">加入</button>
+        </div>
+        <button class="btn btn-ghost" onclick="showCreateView()">← 返回</button>
+      </div>
+
+      <!-- 等待对手 -->
+      <div id="waiting-view" style="display:none;">
+        <div class="waiting-animation">
+          <div class="spinner"></div>
+          <p>等待对手加入...</p>
+          <div class="room-code-display">
+            <span>房间码</span>
+            <strong id="room-code-text"></strong>
+          </div>
+          <p class="share-hint">复制房间码发送给好友</p>
+          <button class="btn btn-ghost" onclick="copyRoomCode()">📋 复制房间码</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 游戏面板 ===== -->
+  <div id="game-view" style="display:none;">
+    <div class="game-container">
+      <!-- 角落品牌标识 -->
+      <div class="brand-logo game-brand">阿标科技</div>
+      <!-- 顶部信息栏 -->
+      <div class="game-topbar">
+        <button class="btn btn-ghost btn-sm" onclick="leaveGame()">← 退出</button>
+        <div class="game-actions">
+          <button id="undo-btn" class="act-btn" onclick="requestUndo()" title="悔棋">↩ 悔棋</button>
+          <button id="mode-toggle" class="act-btn" onclick="togglePlaceMode()" title="切换落子模式">👆 快速</button>
+          <button id="voice-btn" class="act-btn voice-act" onclick="toggleVoice()" title="语音聊天">🎤 开麦</button>
+          <button id="takeover-btn" class="act-btn takeover-act" style="display:none;" onclick="requestTakeover()">🎮 接手</button>
+        </div>
+        <span id="room-label" class="room-label"></span>
+        <span id="spectator-count" class="spec-count" style="display:none;">👁<span id="spec-num">0</span></span>
+      </div>
+
+      <!-- 比分显示 -->
+      <div class="score-board" id="score-board">
+        <div class="score-item">
+          <span class="score-label" id="opponent-score-name">对手</span>
+          <span class="score-value" id="opponent-score">0</span>
+        </div>
+        <div class="score-divider">:</div>
+        <div class="score-item">
+          <span class="score-value" id="player-score">0</span>
+          <span class="score-label" id="player-score-name">你</span>
+        </div>
+      </div>
+
+      <!-- 三合一信息条：对手 | 轮到你 | 你 -->
+      <div class="info-strip">
+        <div class="info-strip-left" id="opponent-info">
+          <span class="is-avatar" id="opponent-avatar">⚪</span>
+          <span class="is-name" id="opponent-name">对手</span>
+          <span class="is-badge" id="opponent-badge">白棋</span>
+        </div>
+        <div class="info-strip-mid">
+          <span id="spectator-badge" class="is-spec" style="display:none;">👁 观战中</span>
+          <span id="turn-indicator" class="is-turn"></span>
+        </div>
+        <div class="info-strip-right" id="player-info">
+          <span class="is-badge" id="player-badge">黑棋</span>
+          <span class="is-name" id="player-name">你</span>
+          <span class="is-avatar" id="player-avatar">⚫</span>
+        </div>
+      </div>
+
+      <!-- 游戏区域 -->
+      <div class="game-area">
+        <!-- 棋盘 -->
+        <div class="board-wrapper">
+          <canvas id="gomoku-board"></canvas>
+        </div>
+      </div>
+
+      <!-- 远程语音播放（隐藏） -->
+      <audio id="remote-audio" autoplay playsinline></audio>
+
+      <!-- 弹幕层 -->
+      <div id="danmaku-layer"></div>
+
+      <!-- 胜利炫酷横幅 -->
+      <div id="victory-banner" class="victory-banner">
+        <span id="victory-icon" class="victory-icon">🏆</span>
+        <span id="victory-text" class="victory-text">VICTORY</span>
+      </div>
+
+      <!-- 手指上方棋盘预览（手机端） -->
+      <canvas id="touch-preview" class="touch-preview" width="100" height="100"></canvas>
+
+      <!-- 聊天区 -->
+      <div class="chat-area">
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-msg chat-msg--system">💡 游戏开始！黑棋先手</div>
+        </div>
+        <div class="chat-input-row">
+          <input
+            type="text"
+            id="chat-input"
+            placeholder="发送消息..."
+            maxlength="100"
+            class="chat-input"
+            onkeydown="if(event.key==='Enter')sendChat()"
+          >
+          <button class="btn btn-primary btn-sm" onclick="sendChat()">发送</button>
+        </div>
+        <div class="quick-chat-row">
+          <button class="quick-chat-btn" onclick="sendQuickChat('你确定？🤨')">你确定？</button>
+          <button class="quick-chat-btn quick-chat-emoji" onclick="sendQuickChat('[嘿嘿]', true)">嘿嘿 😆</button>
+          <button class="quick-chat-btn" onclick="sendQuickChat('那我可要赢了 😎')">要赢了</button>
+          <button class="quick-chat-btn" onclick="sendQuickChat('下错了下错了 😱')">下错了</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 游戏结束弹窗 ===== -->
+  <div id="result-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal result-modal">
+      <div id="result-icon" class="result-icon"></div>
+      <h2 id="result-title" class="result-title"></h2>
+      <p id="result-subtitle" class="result-subtitle"></p>
+      <div class="result-actions">
+        <button class="btn btn-primary" onclick="requestRematch()">🔄 再来一局</button>
+        <button class="btn btn-secondary" onclick="leaveGame()">🚪 退出房间</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 悔棋请求弹窗 ===== -->
+  <div id="undo-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal undo-modal">
+      <div class="undo-modal-icon">
+        <img src="assets/hehe.png" alt="悔棋" style="width:80px;height:auto;">
+      </div>
+      <h3 class="undo-modal-title">对手请求悔棋</h3>
+      <p class="undo-modal-desc">同意后棋局将回退，确定吗？</p>
+      <div class="result-actions">
+        <button class="btn btn-primary" onclick="respondUndo(true)">✅ 同意</button>
+        <button class="btn btn-secondary" onclick="respondUndo(false)">❌ 拒绝</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Toast ===== -->
+  <div id="toast" class="toast"></div>
+
+  <script src="js/lobby.js"></script>
+  <script src="js/gomoku.js"></script>
+</body>
+</html>
