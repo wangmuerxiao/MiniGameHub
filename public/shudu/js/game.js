@@ -705,7 +705,9 @@ function closePasswordDialog() {
 
 function checkPassword() {
   const password = document.getElementById('hint-password').value;
-  if (password === '王标最帅') {
+  // 从配置中读取密码，默认为 888888
+  const correctPassword = window.HINT_PASSWORD || '888888';
+  if (password === correctPassword) {
     hintsUnlimited = true;
     closePasswordDialog();
     showToast('✅ 密码正确，已解锁无限提示！');

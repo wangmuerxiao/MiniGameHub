@@ -314,7 +314,7 @@ room = {
 ## 部署
 
 ```bash
-cd /www/wwwroot/wangbiao_fun/game/server
+cd server
 npm install
 pm2 restart game-platform
 ```
